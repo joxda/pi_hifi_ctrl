@@ -4,6 +4,7 @@ import sys
 import argparse
 import libamp
 
+# TBD need to adapt to new libamp!
 
 # Build argument parser
 parser = argparse.ArgumentParser(description="Control Cambridge Audio amplifiers.")

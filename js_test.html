@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <h2>JavaScript Test</h2>
+
+    <p id="demo"></p>
+    <p id="msg"></p>
+    <p id="gpio"></p>
+    <script>
+        var devs = {
+            'CXA80': 16,
+            'CXC': 20,
+            '640T': 17,
+            'CXA60': 16
+        };
+
+        var cmds = {
+            'CXA80': {
+                'Power_Toggle': 12,
+                'Power_On': 14,
+                'Power_Off': 15,
+                'Mute_Toggle': 13,
+                'Mute_On': 50,
+                'Mute_Off': 51,
+                'Volume_Up': 16,
+                'Volume_Down': 17,
+                'LCD_Bright': 18,
+                'Brightness_Toggle': 72,
+                'LCD_Dim': 19,
+                'LCD_Off': 71,
+                'Speaker_Select': 20,
+                'Speaker_AB': 30,
+                'Speaker_A': 35,
+                'Speaker_B': 39,
+                'Analogue_Stereo_Direct': 78,
+                'Trigger_A': 82,
+                'Trigger_B': 83,
+                'Trigger_C': 84,
+                'Source_Up': 99,
+                'Source_Down': 126,
+                'A1': 100,
+                'A2': 101,
+                'A3': 102,
+                'A4': 103,
+                'A1_(Balanced)': 104,
+                'D1': 105,
+                'D2': 106,
+                'D3': 107,
+                'MP3_': 108,
+                'USB_Audio': 114,
+                'Bluetooth': 115
+            },
+            'CXA60': {
+                'Power_Toggle': 12,
+                'Power_On': 14,
+                'Power_Off': 15,
+                'Mute_Toggle': 13,
+                'Mute_On': 50,
+                'Mute_Off': 51,
+                'Volume_Up': 16,
+                'Volume_Down': 17,
+                'LCD_Bright': 18,
+                'Brightness_Toggle': 72,
+                'LCD_Dim': 19,
+                'LCD_Off': 71,
+                'Speaker_Select': 20,
+                'Speaker_AB': 30,
+                'Speaker_A': 35,
+                'Speaker_B': 39,
+                'Analogue_Stereo_Direct': 78,
+                'Trigger_A': 82,
+                'Trigger_B': 83,
+                'Trigger_C': 84,
+                'Source_Up': 99,
+                'Source_Down': 126,
+                'A1': 100,
+                'A2': 101,
+                'A3': 102,
+                'A4': 103,
+                'D1': 105,
+                'D2': 106,
+                'D3': 107,
+                'MP3_': 108,
+                'USB_Audio': 114
+            },
+            'CXC': {
+                '0': 0,
+                '1': 1,
+                '2': 2,
+                '3': 3,
+                '4': 4,
+                '5': 5,
+                '6': 6,
+                '7': 7,
+                '8': 8,
+                '9': 9,
+                'Power_Toggle': 12,
+                'Power_On': 50,
+                'Power_Off': 51,
+                '-/--_10+': 14,
+                'LCD_Bright': 18,
+                'LCD_Dim': 19,
+                'LCD_Off': 71,
+                'Brightness_Toggle': 72,
+                'Info': 21,
+                'Play/Pause': 24,
+                'Play': 53,
+                'Pause': 48,
+                'Random': 28,
+                'Repeat': 29,
+                'Skip_right': 32,
+                'Skip_left': 33,
+                'Prog': 36,
+                '>>': 43,
+                '<<': 44,
+                'Eject': 45,
+                'Menu': 52,
+                'Stop': 54,
+                'Remain': 61,
+                'Select/Enter': 87
+            },
+            '640T': {
+                'Power': 124,
+                'Brightness': 71,
+                'Auto_Tune': 117,
+                'Mute': 116,
+                'Preset_1': 91,
+                'Preset_2': 92,
+                'Preset_3': 93,
+                'Preset_4': 94,
+                'Preset_5': 95,
+                'Preset_6': 96,
+                'Preset_7': 97,
+                'Preset_8': 98,
+                'Preset_9': 99,
+                'Preset_10': 100,
+                'Scroll_Up': 77,
+                'Scroll_Down': 78,
+                'Select': 87,
+                'Info': 121,
+                'FM/DAB': 101,
+                'Alarm': 125
+            }
+        };
+
+
+
+        document.getElementById("demo").innerHTML = dec2bin('CXA80', 'Power_On');
+        var toggle = false;
+
+        function dec2bin(dev, message) {
+            var RC5_CMD = cmds[dev][document.getElementById('command_id').value];
+            var RC5_START = 0b100 + (0b010 * (RC5_CMD < 64)) + (0b001 * toggle);
+            var RC5_SYS = devs[dev];
+
+            var RC5_MSG = ((RC5_START & 0b111) << 11) | ((RC5_SYS & 0b11111) << 6) | (RC5_CMD & 0b111111);
+            toggle = !toggle;
+            return (RC5_MSG >>> 0).toString(2);
+        }
+
+        var showText = function(target, message, index, interval) {
+            if (index < message.length) {
+                $(target).append(message[index++]);
+                setTimeout(function() {
+                    showText(target, message, index, interval);
+                }, interval);
+            }
+        }
+
+
+        function printLetterByLetter(destination, message, speed) {
+            var i = 0;
+            document.getElementById('gpio').innerHTML = '';
+            var interval = setInterval(function() {
+                var j = Math.floor(i / 2);
+                if (i % 2 == 0) {
+                    document.getElementById(destination).innerHTML += message.charAt(j);
+                    if (message.charAt(j) == "1") {
+                        document.getElementById(destination).style.backgroundColor = "red";
+                        document.getElementById('gpio').innerHTML += '0';
+                    } else {
+                        document.getElementById(destination).style.backgroundColor = "white";
+                        document.getElementById('gpio').innerHTML += '1';
+                    }
+                } else {
+                    if (message.charAt(j) == "1") {
+                        document.getElementById(destination).style.backgroundColor = "white";
+                        document.getElementById('gpio').innerHTML += '1';
+                    } else {
+                        document.getElementById(destination).style.backgroundColor = "red";
+                        document.getElementById('gpio').innerHTML += '0';
+                    }
+                }
+
+                if (i > message.length * 2) {
+                    clearInterval(interval);
+                }
+                i++;
+            }, speed);
+            document.getElementById(destination).innerHTML += "<br>";
+            return false;
+        }
+    </script>
+    <form name="this">
+        <input text="device" value="CXA80" />
+        <input text="command" id="command_id" value="Power_Off" />
+        <input type="button" value="Submit" onclick="return printLetterByLetter('msg', dec2bin('CXA80','Power_Off'), 88.9);" />
+    </form>
+</body>
+
+</html>

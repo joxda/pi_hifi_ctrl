@@ -4,6 +4,7 @@ import argparse
 from urllib.parse import urlparse, parse_qsl
 from functools import partial
 
+# TBD adapt to new libamp if needed...
 class Server(BaseHTTPRequestHandler):
 
   def __init__(self, pin, *args, **kwargs):
