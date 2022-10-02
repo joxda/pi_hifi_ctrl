@@ -4,9 +4,9 @@
 # Confirmed working with:
 #   Cambridge Audio azur 540A v2
 
-#import pigpio
+import pigpio
 
-#pi = pigpio.pi()
+pi = pigpio.pi()
 
 
 #############
@@ -182,7 +182,7 @@ cmd = {
 # Functions #
 #############
 global toggle
-toggle = True # How to make persistent???
+toggle = False # How to make persistent???
 
 def help(dev):
     for com in cmds[dev]:
@@ -254,13 +254,14 @@ def posint(n):
 
 def execute(pin, device, command, repeat):
 
-    # generate RC5 message (int)
-    rc5_msg = build_rc5(dev, command)
-
-    # generate digital manchester-encoded waveform
-    wid = wave_mnch(rc5_msg, pin)
-
     for i in range(repeat):
+	# generate RC5 message (int)
+    	rc5_msg = build_rc5(device, command)
+
+    	# generate digital manchester-encoded waveform
+    	wid = wave_mnch(rc5_msg, pin)
+
+    #for i in range(repeat):
         cbs = pi.wave_send_once(wid)
 
 def print_(msg):
